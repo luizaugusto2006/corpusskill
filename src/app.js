@@ -2,7 +2,7 @@ let state = {
     clinic: { name: 'Minha Clínica', address: '', phone: '', email: '' },
     services: [],
     whatsapp: { token: '', phoneId: '', businessId: '', verifyToken: '' },
-    calendly: { username: '', eventType: '' },
+    calendly: { username: 'smartlamn2026', eventType: '' },
     templates: {
         greeting: `Olá, {nome}! 👋\n\nObrigado pelo interesse em nossos serviços.\n\nPara agendar sua consulta de {servico}, escolha o melhor horário pelo link abaixo:\n\n{link}\n\nQualquer dúvida, estou por aqui!`,
         reminder: `Olá, {nome}, tudo bem? 😊\n\nEstamos definindo os horários da próxima semana.\n\nPara garantir sua vaga para {servico}, acesse nosso link de agendamento:\n\n{link}\n\nAté breve!`,
