@@ -920,6 +920,36 @@ body {
     font-size: 0.875rem;
 }
 
+.setup-complete {
+    text-align: center;
+    padding: 32px 20px;
+}
+
+.setup-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--success-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--success);
+}
+
+.setup-complete h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.setup-complete p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
 .text-muted {
     color: var(--text-secondary);
     font-size: 0.875rem;

@@ -1,7 +1,7 @@
 let state = {
     clinic: { name: 'Minha Clínica', address: '', phone: '', email: '' },
     services: [],
-    whatsapp: { token: '', phoneId: '', businessId: '', verifyToken: '' },
+    whatsapp: { configured: true },
     calendly: { username: 'smartlamn2026', eventType: '' },
     templates: {
         greeting: `Olá, {nome}! 👋\n\nObrigado pelo interesse em nossos serviços.\n\nPara agendar sua consulta de {servico}, escolha o melhor horário pelo link abaixo:\n\n{link}\n\nQualquer dúvida, estou por aqui!`,
@@ -67,7 +67,7 @@ function navigateTo(page) {
 
 function renderDashboard() {
     document.getElementById('totalServices').textContent = state.services.length;
-    const connected = state.whatsapp.token && state.whatsapp.phoneId;
+    const connected = state.whatsapp.configured;
     const ws = document.getElementById('whatsappStatus');
     ws.textContent = connected ? 'Conectado' : 'Não conectado';
     ws.style.color = connected ? 'var(--success)' : 'var(--text-secondary)';
@@ -208,37 +208,22 @@ function genLink(service) {
 }
 
 function loadWhatsApp() {
-    document.getElementById('whatsappToken').value = state.whatsapp.token || '';
-    document.getElementById('whatsappPhoneId').value = state.whatsapp.phoneId || '';
-    document.getElementById('whatsappBusinessId').value = state.whatsapp.businessId || '';
-    document.getElementById('verifyToken').value = state.whatsapp.verifyToken || '';
     updateApiBadge();
 }
 
 function updateApiBadge() {
     const b = document.getElementById('apiStatusBadge');
-    const ok = state.whatsapp.token && state.whatsapp.phoneId;
-    b.textContent = ok ? 'Configurado' : 'Não configurado';
+    const ok = state.whatsapp.configured;
+    b.textContent = ok ? 'Configurado via Twilio' : 'Não configurado';
     b.className = 'badge' + (ok ? ' success' : '');
 }
 
-function generateVerifyToken() {
-    const t = 'fisio_' + Math.random().toString(36).substr(2, 16);
-    document.getElementById('verifyToken').value = t;
-    state.whatsapp.verifyToken = t;
-    save();
-    toast('Token gerado!');
-}
-
 function saveWhatsAppConfig() {
-    state.whatsapp.token = document.getElementById('whatsappToken').value.trim();
-    state.whatsapp.phoneId = document.getElementById('whatsappPhoneId').value.trim();
-    state.whatsapp.businessId = document.getElementById('whatsappBusinessId').value.trim();
-    state.whatsapp.verifyToken = document.getElementById('verifyToken').value.trim();
+    state.whatsapp.configured = true;
     save();
     updateApiBadge();
     renderDashboard();
-    toast('WhatsApp configurado!');
+    toast('WhatsApp configurado via Twilio!');
 }
 
 function copyWebhookUrl() {
@@ -249,12 +234,6 @@ async function testWhatsAppConnection() {
     const phone = document.getElementById('testPhone').value.trim();
     const result = document.getElementById('testResult');
     if (!phone) return toast('Informe um número', 'error');
-    if (!state.whatsapp.token || !state.whatsapp.phoneId) {
-        result.style.display = 'block';
-        result.className = 'test-result error';
-        result.textContent = 'Configure as credenciais primeiro';
-        return;
-    }
     result.style.display = 'block';
     result.className = 'test-result';
     result.textContent = 'Enviando...';
@@ -262,14 +241,14 @@ async function testWhatsAppConnection() {
         const r = await fetch('/api/send-message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ to: phone, message: '🏥 Mensagem de teste do FisioAgenda!', token: state.whatsapp.token, phoneId: state.whatsapp.phoneId })
+            body: JSON.stringify({ to: phone, message: '🏥 Mensagem de teste do FisioAgenda! Se recebeu, está tudo funcionando.' })
         });
         const d = await r.json();
         result.className = 'test-result ' + (d.success ? 'success' : 'error');
-        result.textContent = d.success ? '✅ Enviado com sucesso!' : `❌ ${d.error || 'Erro ao enviar'}`;
+        result.textContent = d.success ? '✅ Enviado com sucesso! Verifique seu WhatsApp.' : `❌ ${d.error || 'Erro ao enviar'}`;
     } catch {
         result.className = 'test-result error';
-        result.textContent = '❌ Erro de conexão';
+        result.textContent = '❌ Erro de conexão com o servidor';
     }
 }
 
@@ -336,7 +315,7 @@ async function sendWhatsAppMessage() {
         const r = await fetch('/api/send-message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ to: phone, message: msg, token: state.whatsapp.token, phoneId: state.whatsapp.phoneId })
+            body: JSON.stringify({ to: phone, message: msg })
         });
         const d = await r.json();
         if (d.success) {
@@ -404,7 +383,7 @@ async function sendBatchMessages() {
         if (!s) { err++; continue; }
         const msg = state.templates.greeting.replace(/{nome}/g, c.nome).replace(/{servico}/g, s.name).replace(/{link}/g, genLink(s));
         try {
-            const r = await fetch('/api/send-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to: c.telefone, message: msg, token: state.whatsapp.token, phoneId: state.whatsapp.phoneId }) });
+            const r = await fetch('/api/send-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to: c.telefone, message: msg }) });
             const d = await r.json();
             d.success ? sent++ : err++;
         } catch { err++; }

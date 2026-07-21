@@ -200,61 +200,26 @@
                 <div class="page-header">
                     <div>
                         <h1>WhatsApp Business API</h1>
-                        <p class="page-subtitle">Configure a integração com a API oficial do WhatsApp</p>
+                        <p class="page-subtitle">Integração via Twilio - configurada automaticamente</p>
                     </div>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
-                        <h2>Credenciais da API</h2>
-                        <span class="badge" id="apiStatusBadge">Não configurado</span>
+                        <h2>Status da Conexão</h2>
+                        <span class="badge success" id="apiStatusBadge">Configurado via Twilio</span>
                     </div>
                     <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Token de Acesso Permanente</label>
-                                <input type="password" id="whatsappToken" placeholder="Cole seu token aqui">
-                                <span class="form-hint">Obtido no Meta Business → Configurações → WhatsApp → API</span>
-                            </div>
-                            <div class="form-group">
-                                <label>ID do Número de Telefone</label>
-                                <input type="text" id="whatsappPhoneId" placeholder="Ex: 1234567890">
-                                <span class="form-hint">Número ID do seu telefone Business verificado</span>
-                            </div>
-                            <div class="form-group">
-                                <label>ID da Conta Business</label>
-                                <input type="text" id="whatsappBusinessId" placeholder="Ex: 1234567890123456">
-                                <span class="form-hint">ID da sua conta no Meta Business Suite</span>
-                            </div>
-                            <div class="form-group">
-                                <label>Token de Verificação do Webhook</label>
-                                <div class="input-group">
-                                    <input type="text" id="verifyToken" readonly>
-                                    <button class="btn-outline" onclick="generateVerifyToken()">Gerar</button>
-                                </div>
-                                <span class="form-hint">Use este token para verificar o webhook no Meta</span>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button class="btn-primary" onclick="saveWhatsAppConfig()">Salvar Credenciais</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2>URL do Webhook</h2>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted">Configure esta URL no painel do Meta Business para receber confirmações de agendamento:</p>
-                        <div class="url-box">
-                            <code id="webhookUrl">https://corpusskill-ehg3xuuhx-corpusskill.vercel.app/api/webhook</code>
-                            <button class="btn-icon" onclick="copyWebhookUrl()" title="Copiar">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        <div class="setup-complete">
+                            <div class="setup-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                 </svg>
-                            </button>
+                            </div>
+                            <h3>WhatsApp Configurado!</h3>
+                            <p>A integração com Twilio está ativa. Você pode enviar mensagens pela página "Enviar Mensagem".</p>
+                            <p class="text-muted">Número configurado: <strong>5521964351472</strong></p>
                         </div>
                     </div>
                 </div>
@@ -281,44 +246,6 @@
                             </div>
                         </div>
                         <div id="testResult" class="test-result" style="display: none;"></div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Guia de Configuração</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="steps">
-                            <div class="step">
-                                <div class="step-number">1</div>
-                                <div class="step-content">
-                                    <h4>Crie uma conta no Meta Business</h4>
-                                    <p>Acesse <a href="https://business.facebook.com" target="_blank">business.facebook.com</a> e crie uma conta Business gratuita</p>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-number">2</div>
-                                <div class="step-content">
-                                    <h4>Ative o WhatsApp Business API</h4>
-                                    <p>No Meta Business Suite, vá em Configurações → WhatsApp → API</p>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-number">3</div>
-                                <div class="step-content">
-                                    <h4>Gere um Token Permanente</h4>
-                                    <p>Clique em "Gerar Token" e copie para o campo acima</p>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-number">4</div>
-                                <div class="step-content">
-                                    <h4>Configure o Webhook</h4>
-                                    <p>Cole a URL acima no painel do Meta e use o Token de Verificação gerado</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
