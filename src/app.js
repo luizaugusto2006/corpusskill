@@ -312,7 +312,7 @@ async function sendWhatsAppMessage() {
     if (!sid) return toast('Selecione um serviço', 'error');
     if (!state.whatsapp.token || !state.whatsapp.phoneId) return toast('Configure o WhatsApp primeiro', 'error');
     try {
-        const r = await fetch('/api/send-message', {
+        const r = await fetch('/.netlify/functions/send-message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ to: phone, message: msg })
@@ -383,7 +383,7 @@ async function sendBatchMessages() {
         if (!s) { err++; continue; }
         const msg = state.templates.greeting.replace(/{nome}/g, c.nome).replace(/{servico}/g, s.name).replace(/{link}/g, genLink(s));
         try {
-            const r = await fetch('/api/send-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to: c.telefone, message: msg }) });
+            const r = await fetch('/.netlify/functions/send-message', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to: c.telefone, message: msg }) });
             const d = await r.json();
             d.success ? sent++ : err++;
         } catch { err++; }

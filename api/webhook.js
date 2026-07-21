@@ -1,62 +1,22 @@
-// Webhook para receber atualizações de status do WhatsApp
-// Configurar no Meta Business Suite
+exports.handler = async (event) => {
+    const headers = { 'Access-Control-Allow-Origin': '*' };
 
-export default async function handler(req, res) {
-    // Verificação do webhook (GET)
-    if (req.method === 'GET') {
-        const mode = req.query['hub.mode'];
-        const token = req.query['hub.verify_token'];
-        const challenge = req.query['hub.challenge'];
+    if (event.httpMethod === 'GET') {
+        const params = new URLSearchParams(event.queryStringParameters || {});
+        const mode = params.get('hub.mode');
+        const token = params.get('hub.verify_token');
+        const challenge = params.get('hub.challenge');
 
         if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
-            console.log('Webhook verificado!');
-            return res.status(200).send(challenge);
-        } else {
-            return res.sendStatus(403);
+            return { statusCode: 200, body: challenge };
         }
+        return { statusCode: 403, body: 'Forbidden' };
     }
 
-    // Receber atualizações (POST)
-    if (req.method === 'POST') {
-        try {
-            const body = req.body;
-
-            if (body.object === 'whatsapp_business_account') {
-                const entries = body.entry || [];
-                
-                for (const entry of entries) {
-                    const changes = entry.changes || [];
-                    
-                    for (const change of changes) {
-                        if (change.field === 'messages') {
-                            const value = change.value;
-                            
-                            // Processar status de entrega
-                            if (value.statuses) {
-                                for (const status of value.statuses) {
-                                    console.log(`Status da mensagem ${status.id}: ${status.status}`);
-                                    // Aqui você pode salvar no banco de dados
-                                }
-                            }
-                            
-                            // Processar mensagens recebidas
-                            if (value.messages) {
-                                for (const msg of value.messages) {
-                                    console.log(`Mensagem recebida de ${msg.from}: ${msg.text?.body}`);
-                                    // Aqui você pode processar respostas automáticas
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return res.status(200).send('OK');
-        } catch (error) {
-            console.error('Erro no webhook:', error);
-            return res.status(500).send('Erro interno');
-        }
+    if (event.httpMethod === 'POST') {
+        console.log('Webhook received:', event.body);
+        return { statusCode: 200, body: 'OK' };
     }
 
-    return res.status(405).send('Method not allowed');
-}
+    return { statusCode: 405, body: 'Method not allowed' };
+};

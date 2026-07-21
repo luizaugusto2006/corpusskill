@@ -1,15 +1,22 @@
-export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+exports.handler = async (event) => {
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    };
 
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 200, headers, body: '' };
+    }
 
-    const { to, message } = req.body;
+    if (event.httpMethod !== 'POST') {
+        return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    }
+
+    const { to, message } = JSON.parse(event.body || '{}');
 
     if (!to || !message) {
-        return res.status(400).json({ error: 'Telefone e mensagem são obrigatórios' });
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Telefone e mensagem são obrigatórios' }) };
     }
 
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -17,14 +24,13 @@ export default async function handler(req, res) {
     const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER;
 
     if (!accountSid || !authToken || !fromNumber) {
-        return res.status(500).json({ error: 'Twilio não configurado no servidor' });
+        return { statusCode: 500, headers, body: JSON.stringify({ error: 'Twilio não configurado' }) };
     }
 
     try {
         const phone = to.replace(/\D/g, '');
         const formattedTo = phone.startsWith('55') ? `whatsapp:+${phone}` : `whatsapp:+55${phone}`;
         const formattedFrom = `whatsapp:+${fromNumber}`;
-
         const credentials = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
 
         const response = await fetch(
@@ -39,24 +45,18 @@ export default async function handler(req, res) {
                     From: formattedFrom,
                     To: formattedTo,
                     Body: message
-                })
+                }).toString()
             }
         );
 
         const data = await response.json();
 
         if (data.sid) {
-            return res.status(200).json({ success: true, messageId: data.sid });
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true, messageId: data.sid }) };
         } else {
-            return res.status(400).json({ 
-                success: false, 
-                error: data.message || data.error_message || 'Erro ao enviar mensagem' 
-            });
+            return { statusCode: 400, headers, body: JSON.stringify({ success: false, error: data.message || 'Erro ao enviar' }) };
         }
     } catch (error) {
-        return res.status(500).json({ 
-            success: false, 
-            error: 'Erro de conexão com Twilio' 
-        });
+        return { statusCode: 500, headers, body: JSON.stringify({ success: false, error: 'Erro de conexão' }) };
     }
-}
+};
